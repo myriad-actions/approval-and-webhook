@@ -40,7 +40,6 @@ runs:
     
     - name: Approval
       uses: trstringer/manual-approval@v1
-      timeout-minutes: 20
       with:
         secret: "${{ inputs.gh_pat }}"
         approvers: ${{ steps.codeowners.outputs.approvers }}
