@@ -15,11 +15,6 @@ inputs:
     description: "GitHub Personal Access Token"
     required: true
 
-outputs:  
-  approvers:
-    description: "Approvers extracted from CODEOWNERS"
-    value: ${{ steps.parse_codeowners.outputs.approvers }}
-
 runs:
   using: 'composite'
   steps:
@@ -29,6 +24,7 @@ runs:
         fetch-depth: 0
     
     - name: Parse CODEOWNERS from .github folder
+      id: codeowners  
       run: |
         CODEOWNERS_FILE=".github/CODEOWNERS"
         if [ ! -f "$CODEOWNERS_FILE" ]; then
