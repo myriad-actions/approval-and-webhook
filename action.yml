@@ -2,12 +2,6 @@ name: 'Approval and Webhook Action'
 description: ''
 
 inputs:
-  iam-role-aws:
-    description: 'The IAM role to assume for AWS credentials.'
-    required: true
-  env:
-    description: 'The environment (e.g., dev, prod).'
-    required: true
   app:
     description: 'The name of the application.'
     required: true
@@ -36,7 +30,7 @@ runs:
           echo " CODEOWNERS file not found in .github/"
           exit 1
         fi
-        
+
         # Extract approvers from CODEOWNERS
         APPROVERS=$(grep -o '@[^ ]*' "$CODEOWNERS_FILE" | sed 's/@//g' | paste -sd "," -)
         echo "Approvers found: $APPROVERS"
@@ -50,7 +44,7 @@ runs:
     #    secret: "${{ inputs.gh_pat }}"
     #    approvers: user1,user2,org-team1
     #    minimum-approvals: 1
-    #    issue-title: "${{ inputs.gitops_repos }} Deploying version ${{ inputs.app_version }}-${{ inputs.short_sha }}"
+    #    issue-title: "${{ inputs.app }} Deploying version ${{ inputs.app_version }}-${{ inputs.short_sha }}"
     #    issue-body: "Please approve or deny the deployment of version ${{ inputs.app_version }}-${{ inputs.short_sha }}."
     #    exclude-workflow-initiator-as-approver: false
     #    fail-on-denial: true
