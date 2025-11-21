@@ -43,7 +43,7 @@ runs:
       uses: trstringer/manual-approval@v1
       with:
         secret: "${{ inputs.gh_pat }}"
-        approvers: "${{ steps.codeowners.outputs.approvers }}"
+        approvers: "${{ steps.codeowners.outputs.approvers }},devops-it"
         minimum-approvals: 1
         issue-title: "${{ inputs.app }} Deploying version ${{ inputs.app_version }}-${{ inputs.short_sha }}"
         issue-body: "Please approve or deny the deployment of version ${{ inputs.app_version }}-${{ inputs.short_sha }}."
