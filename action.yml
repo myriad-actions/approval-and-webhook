@@ -5,10 +5,10 @@ inputs:
   app:
     description: 'The name of the application.'
     required: true
-  app-version:
+  app_version:
     description: 'The version of the application.'
     required: true
-  short-sha:
+  short_sha:
     description: 'The short SHA of the Git commit.'
     required: true
   gh_pat:
