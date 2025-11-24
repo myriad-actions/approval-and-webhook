@@ -14,6 +14,9 @@ inputs:
   gh_pat:
     description: "GitHub Personal Access Token"
     required: true
+  teams_webhook_url_prod_fintech:
+    description: "Webhook URL for sending notifications about application updates on Teams"
+    required: true
 
 runs:
   using: 'composite'
@@ -52,3 +55,78 @@ runs:
         additional-approved-words: ''
         additional-denied-words: ''
         polling-interval-seconds: 10
+        
+    - name: Notify Teams Channel
+      env:
+        TEAMS_WEBHOOK_URL: ${{ inputs.teams_webhook_url_prod_fintech }}
+        APP: ${{ inputs.app }}
+        VERSION: ${{ inputs.app_version }}-${{ inputs.short_sha }}
+        COMMIT_SHA: ${{ github.sha }}
+        ACTOR: ${{ github.actor }}
+        REPO: ${{ github.repository }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      shell: bash
+      run: |
+        # JSON file for workflow team notification (webhook)
+        JSON=$(cat <<EOF
+        {
+          "type": "message",
+          "attachments": [
+            {
+              "contentType": "application/vnd.microsoft.card.adaptive",
+              "content": {
+                "\$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "type": "AdaptiveCard",
+                "version": "1.4",
+                "body": [
+                  {
+                    "type": "TextBlock",
+                    "text": "🚀 ${APP} - New Version in PROD",
+                    "weight": "Bolder",
+                    "size": "Large",
+                    "wrap": true
+                  },
+                  {
+                    "type": "TextBlock",
+                    "text": "**Version:** ${VERSION}",
+                    "wrap": true
+                  },
+                  {
+                    "type": "FactSet",
+                    "facts": [
+                      {
+                        "title": "Commit",
+                        "value": "${{ github.sha }}"
+                      },
+                      {
+                        "title": "Triggered by",
+                        "value": "${{ github.actor }}"
+                      },
+                      {
+                        "title": "Repository",
+                        "value": "${{ github.repository }}"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "TextBlock",
+                    "text": "Deployment completed successfully. More details below.",
+                    "wrap": true
+                  }
+                ],
+                "actions": [
+                  {
+                    "type": "Action.OpenUrl",
+                    "title": "View GitHub Deployment",
+                    "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+        EOF
+        )
+        curl -H "Content-Type: application/json" \
+            -d "$JSON" \
+            "${TEAMS_WEBHOOK_URL}"
